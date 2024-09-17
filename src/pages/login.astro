@@ -1,0 +1,53 @@
+<!-- src/pages/login.astro -->
+<h1>Login</h1>
+
+<form id="loginForm">
+  <label for="username">Username:</label>
+  <input type="text" id="username" name="username" required>
+
+  <label for="password">Password:</label>
+  <input type="password" id="password" name="password" required>
+
+  <button type="submit">Login</button>
+</form>
+
+<p id="message"></p>
+
+<script>
+  // Typecasting form to HTMLFormElement
+  const form = document.getElementById('loginForm') as HTMLFormElement;
+  const messageElement = document.getElementById('message') as HTMLParagraphElement;
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const data = new FormData(form);
+    const loginData = {
+      username: data.get('username') as string,
+      password: data.get('password') as string
+    };
+
+    try {
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(loginData),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        messageElement.textContent = 'Login Successful!';
+        messageElement.style.color = 'green';
+        window.location.href = '/products';
+      } else {
+        messageElement.textContent = result.message || 'Login failed, please try again.';
+        messageElement.style.color = 'red';
+      }
+    } catch (error) {
+      messageElement.textContent = 'An error occurred. Please try again later.';
+      messageElement.style.color = 'red';
+    }
+  });
+</script>

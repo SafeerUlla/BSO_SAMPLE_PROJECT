@@ -1,0 +1,33 @@
+---
+import { createSignal, onCleanup, onMount } from 'solid-js';
+
+const [products, setProducts] = createSignal([]);
+
+onMount(async () => {
+  const res = await fetch('/api/products');
+  const data = await res.json();
+  setProducts(data);
+});
+
+async function addToCart(productId) {
+  await fetch('/api/cart/add', {
+    method: 'POST',
+    body: JSON.stringify({ productId }),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  alert('Added to cart');
+}
+---
+
+<ul>
+  {products().map(product => (
+    <li key={product.id as string}>
+    <h2>{product.title}</h2>
+    <img src={product.image.url} alt={product.title} />
+    <p>Price: ${product.price}</p>
+    <button onClick={() => addToCart(product.id)}>Add to Cart</button>
+</li>
+  ))}
+</ul>
